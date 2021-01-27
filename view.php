@@ -66,7 +66,7 @@ if ($is_valid_web && $is_valid_module && $has_id_param && $is_in_same_domain) {
 }
 
 // Course or module does not exist
-if (!$does_course_module_exist) {
+if (!$does_course_module_exist || !$cm_destination || !$course_destination) {
     sharedurl_print_header($url, $cm, $course);
     sharedurl_print_heading($url, $cm, $course);
     notice(get_string('invalidstoredurl', 'sharedurl'), new moodle_url('/course/view.php', array('id' => $cm->course)));
