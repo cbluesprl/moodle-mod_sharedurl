@@ -31,7 +31,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_url_install() {
+function xmldb_sharedurl_install() {
     global $CFG;
 
 }

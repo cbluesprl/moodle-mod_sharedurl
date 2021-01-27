@@ -26,7 +26,7 @@
 $plugin['pluginname']            = 'Shared URL';
 $string['modulename']            = 'URL partagée';
 $string['modulename_help']       = 'Shared URL module permits teachers to add a link to an existing course\'s activity.
-                                    It works with then enrol plugin "enrol_shared" which automatically enrol users to that course if they are not already enrolled.';
+                                    It works with the enrol plugin "enrol_shared" which automatically enrol users to that course if they are not already enrolled.';
 
 $string['externalurl']           = 'Activity\'s URL';
 $string['invalidstoredurl']      = 'Cannot display this page. The URL must redirect to an existing activity of this moodle.';
