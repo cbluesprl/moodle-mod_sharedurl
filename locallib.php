@@ -155,12 +155,13 @@ function sharedurl_print_heading($url, $cm, $course, $notused = false)
 }
 
 /**
- * TODO
- * Return the corresponding activity's acin according to the destination activity type
+ * TODO : Would be a good idea to change the default activity's icon depending on the destination module's type
+ *
  * @param $fullurl
  * @param int $size of the icon.
  * @return string|null icon or null if the fullurl is not relevant
  */
+/*
 function sharedurl_guess_icon($fullurl, $size = null)
 {
     global $CFG, $DB;
@@ -194,7 +195,8 @@ function sharedurl_guess_icon($fullurl, $size = null)
         }
     }
 
-    // TODO : ne fonctionne pas... Les images ne sont pas chargées aussi facilement. A voir si possible de trouver une solution.
+    // TODO : Do not work for now...
 
     return $icon;
 }
+*/

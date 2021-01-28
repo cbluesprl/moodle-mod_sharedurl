@@ -194,8 +194,8 @@ function sharedurl_get_coursemodule_info($coursemodule)
     $info = new cached_cm_info();
     $info->name = $url->name;
 
-    //note: there should be a way to differentiate links from normal resources
-    $info->icon = sharedurl_guess_icon($url->externalurl, 24);
+    // TODO : Would be a good idea to change the default activity's icon depending on the destination module's type
+    //$info->icon = sharedurl_guess_icon($url->externalurl, 24);
     $fullurl = "$CFG->wwwroot/mod/sharedurl/view.php?id=$coursemodule->id&amp;redirect=1";
     $info->onclick = "window.open('$fullurl'); return false;";
 
