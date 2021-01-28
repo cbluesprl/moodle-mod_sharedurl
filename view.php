@@ -105,7 +105,8 @@ if (!is_enrolled($context, $USER->id, '', true)) {
     $instance = $DB->get_record('enrol', array('courseid' => $course_destination->id, 'enrol' => 'shared'), '*', MUST_EXIST);
 
     // Enrol the user via enrol_shared method
-    $enrol_plugin->enrol_user($instance, $USER->id, $instance->roleid, $instance->enrolstartdate, $instance->enrolenddate);
+    $timeend = time() + $instance->enrolperiod; // End of enrol is based on instance's enrol period
+    $enrol_plugin->enrol_user($instance, $USER->id, $instance->roleid, $instance->enrolstartdate, $timeend);
 }
 
 redirect($fullurl);
