@@ -34,6 +34,8 @@ class mod_sharedurl_mod_form extends moodleform_mod {
         global $CFG;
         $mform = $this->_form;
 
+        $config = get_config('sharedurl');
+
         //-------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'48'));
@@ -54,10 +56,70 @@ class mod_sharedurl_mod_form extends moodleform_mod {
         $element->setAttributes($attributes);
 
         //-------------------------------------------------------
+        $mform->addElement('header', 'optionssection', get_string('appearance'));
+
+        if ($this->current->instance) {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+        } else {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+        }
+        if (count($options) == 1) {
+            $mform->addElement('hidden', 'display');
+            $mform->setType('display', PARAM_INT);
+            reset($options);
+            $mform->setDefault('display', key($options));
+        } else {
+            $mform->addElement('select', 'display', get_string('displayselect', 'sharedurl'), $options);
+            $mform->setDefault('display', $config->display);
+            $mform->addHelpButton('display', 'displayselect', 'sharedurl');
+        }
+
+        if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
+            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'sharedurl'), array('size'=>3));
+            if (count($options) > 1) {
+                $mform->hideIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupwidth', PARAM_INT);
+            $mform->setDefault('popupwidth', $config->popupwidth);
+
+            $mform->addElement('text', 'popupheight', get_string('popupheight', 'sharedurl'), array('size'=>3));
+            if (count($options) > 1) {
+                $mform->hideIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupheight', PARAM_INT);
+            $mform->setDefault('popupheight', $config->popupheight);
+        }
+
+        if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
+            array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
+            array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
+            $mform->addElement('checkbox', 'printintro', get_string('printintro', 'sharedurl'));
+            $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);
+            $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
+            $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
+            $mform->setDefault('printintro', $config->printintro);
+        }
+
+        //-------------------------------------------------------
         $this->standard_coursemodule_elements();
 
         //-------------------------------------------------------
         $this->add_action_buttons();
+    }
+
+    function data_preprocessing(&$default_values) {
+        if (!empty($default_values['displayoptions'])) {
+            $displayoptions = unserialize($default_values['displayoptions']);
+            if (isset($displayoptions['printintro'])) {
+                $default_values['printintro'] = $displayoptions['printintro'];
+            }
+            if (!empty($displayoptions['popupwidth'])) {
+                $default_values['popupwidth'] = $displayoptions['popupwidth'];
+            }
+            if (!empty($displayoptions['popupheight'])) {
+                $default_values['popupheight'] = $displayoptions['popupheight'];
+            }
+        }
     }
 
     function validation($data, $files) {

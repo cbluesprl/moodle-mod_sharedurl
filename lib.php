@@ -112,6 +112,16 @@ function sharedurl_add_instance($data, $mform)
 
     $data->externalurl = sharedurl_fix_submitted_url($data->externalurl);
 
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
+    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
+        $displayoptions['printintro']   = (int)!empty($data->printintro);
+    }
+    $data->displayoptions = serialize($displayoptions);
+
     $data->timemodified = time();
     $data->id = $DB->insert_record('sharedurl', $data);
 
@@ -134,6 +144,16 @@ function sharedurl_update_instance($data, $mform)
     require_once($CFG->dirroot . '/mod/sharedurl/locallib.php');
 
     $data->externalurl = sharedurl_fix_submitted_url($data->externalurl);
+
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
+    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
+        $displayoptions['printintro']   = (int)!empty($data->printintro);
+    }
+    $data->displayoptions = serialize($displayoptions);
 
     $data->timemodified = time();
     $data->id = $data->instance;
@@ -196,8 +216,21 @@ function sharedurl_get_coursemodule_info($coursemodule)
 
     // TODO : Would be a good idea to change the default activity's icon depending on the destination module's type
     //$info->icon = sharedurl_guess_icon($url->externalurl, 24);
-    $fullurl = "$CFG->wwwroot/mod/sharedurl/view.php?id=$coursemodule->id&amp;redirect=1";
-    $info->onclick = "window.open('$fullurl'); return false;";
+    $display = sharedurl_get_final_display_type($url);
+
+    if ($display == RESOURCELIB_DISPLAY_POPUP) {
+        $fullurl = "$CFG->wwwroot/mod/sharedurl/view.php?id=$coursemodule->id&amp;redirect=1";
+        $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
+        $width  = empty($options['popupwidth'])  ? 620 : $options['popupwidth'];
+        $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
+
+    } else if ($display == RESOURCELIB_DISPLAY_NEW) {
+        $fullurl = "$CFG->wwwroot/mod/sharedurl/view.php?id=$coursemodule->id&amp;redirect=1";
+        $info->onclick = "window.open('$fullurl'); return false;";
+
+    }
 
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
@@ -271,4 +304,45 @@ function sharedurl_view($url, $course, $cm, $context)
     // Completion.
     $completion = new completion_info($course);
     $completion->set_module_viewed($cm);
+}
+
+/**
+ * Decide the best display format.
+ * @param object $url
+ * @return int display type constant
+ */
+function sharedurl_get_final_display_type($url) {
+    global $CFG;
+
+    if ($url->display != RESOURCELIB_DISPLAY_AUTO) {
+        return $url->display;
+    }
+
+    // detect links to local moodle pages
+    if (strpos($url->externalurl, $CFG->wwwroot) === 0) {
+        if (strpos($url->externalurl, 'file.php') === false and strpos($url->externalurl, '.php') !== false ) {
+            // most probably our moodle page with navigation
+            return RESOURCELIB_DISPLAY_OPEN;
+        }
+    }
+
+    static $download = array('application/zip', 'application/x-tar', 'application/g-zip',     // binary formats
+        'application/pdf', 'text/html');  // these are known to cause trouble for external links, sorry
+    static $embed    = array('image/gif', 'image/jpeg', 'image/png', 'image/svg+xml',         // images
+        'application/x-shockwave-flash', 'video/x-flv', 'video/x-ms-wm', // video formats
+        'video/quicktime', 'video/mpeg', 'video/mp4',
+        'audio/mp3', 'audio/x-realaudio-plugin', 'x-realaudio-plugin',   // audio formats,
+    );
+
+    $mimetype = resourcelib_guess_url_mimetype($url->externalurl);
+
+    if (in_array($mimetype, $download)) {
+        return RESOURCELIB_DISPLAY_DOWNLOAD;
+    }
+    if (in_array($mimetype, $embed)) {
+        return RESOURCELIB_DISPLAY_EMBED;
+    }
+
+    // let the browser deal with it somehow
+    return RESOURCELIB_DISPLAY_OPEN;
 }

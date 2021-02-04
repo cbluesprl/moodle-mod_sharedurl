@@ -85,9 +85,6 @@ function sharedurl_fix_submitted_url($url)
  */
 function sharedurl_get_full_url($url, $cm, $course, $config = null)
 {
-
-    $parameters = empty($url->parameters) ? array() : unserialize($url->parameters);
-
     // make sure there are no encoded entities, it is ok to do this twice
     $fullurl = html_entity_decode($url->externalurl, ENT_QUOTES, 'UTF-8');
 
@@ -152,6 +149,169 @@ function sharedurl_print_heading($url, $cm, $course, $notused = false)
 {
     global $OUTPUT;
     echo $OUTPUT->heading(format_string($url->name), 2);
+}
+
+/**
+ * Print url introduction.
+ * @param object $url
+ * @param object $cm
+ * @param object $course
+ * @param bool $ignoresettings print even if not specified in modedit
+ * @return void
+ */
+function sharedurl_print_intro($url, $cm, $course, $ignoresettings=false) {
+    global $OUTPUT;
+
+    $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
+    if ($ignoresettings or !empty($options['printintro'])) {
+        if (trim(strip_tags($url->intro))) {
+            echo $OUTPUT->box_start('mod_introbox', 'urlintro');
+            echo format_module_intro('sharedurl', $url, $cm->id);
+            echo $OUTPUT->box_end();
+        }
+    }
+}
+
+/**
+ * Display url frames.
+ * @param object $url
+ * @param object $cm
+ * @param object $course
+ * @return does not return
+ */
+function sharedurl_display_frame($url, $cm, $course) {
+    global $PAGE, $OUTPUT, $CFG;
+
+    $frame = optional_param('frameset', 'main', PARAM_ALPHA);
+
+    if ($frame === 'top') {
+        $PAGE->set_pagelayout('frametop');
+        sharedurl_print_header($url, $cm, $course);
+        sharedurl_print_heading($url, $cm, $course);
+        sharedurl_print_intro($url, $cm, $course);
+        echo $OUTPUT->footer();
+        die;
+
+    } else {
+        $config = get_config('sharedurl');
+        $context = context_module::instance($cm->id);
+        $exteurl = sharedurl_get_full_url($url, $cm, $course, $config);
+        $navurl = "$CFG->wwwroot/mod/sharedurl/view.php?id=$cm->id&amp;frameset=top";
+        $coursecontext = context_course::instance($course->id);
+        $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
+        $title = strip_tags($courseshortname.': '.format_string($url->name));
+        $framesize = $config->framesize;
+        $modulename = s(get_string('modulename','sharedurl'));
+        $contentframetitle = s(format_string($url->name));
+        $dir = get_string('thisdirection', 'langconfig');
+
+        $extframe = <<<EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html dir="$dir">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>$title</title>
+  </head>
+  <frameset rows="$framesize,*">
+    <frame src="$navurl" title="$modulename"/>
+    <frame src="$exteurl" title="$contentframetitle"/>
+  </frameset>
+</html>
+EOF;
+
+        @header('Content-Type: text/html; charset=utf-8');
+        echo $extframe;
+        die;
+    }
+}
+
+/**
+ * Print url info and link.
+ * @param object $url
+ * @param object $cm
+ * @param object $course
+ * @return does not return
+ */
+function sharedurl_print_workaround($url, $cm, $course) {
+    global $OUTPUT;
+
+    sharedurl_print_header($url, $cm, $course);
+    sharedurl_print_heading($url, $cm, $course, true);
+    sharedurl_print_intro($url, $cm, $course, true);
+
+    $fullurl = sharedurl_get_full_url($url, $cm, $course);
+
+    $display = sharedurl_get_final_display_type($url);
+    if ($display == RESOURCELIB_DISPLAY_POPUP) {
+        $jsfullurl = addslashes_js($fullurl);
+        $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
+        $width  = empty($options['popupwidth'])  ? 620 : $options['popupwidth'];
+        $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        $extra = "onclick=\"window.open('$jsfullurl', '', '$wh'); return false;\"";
+
+    } else if ($display == RESOURCELIB_DISPLAY_NEW) {
+        $extra = "onclick=\"this.target='_blank';\"";
+
+    } else {
+        $extra = '';
+    }
+
+    echo '<div class="urlworkaround">';
+    print_string('clicktoopen', 'sharedurl', "<a href=\"$fullurl\" $extra>$fullurl</a>");
+    echo '</div>';
+
+    echo $OUTPUT->footer();
+    die;
+}
+
+/**
+ * Display embedded url file.
+ * @param object $url
+ * @param object $cm
+ * @param object $course
+ * @return does not return
+ */
+function sharedurl_display_embed($url, $cm, $course) {
+    global $CFG, $PAGE, $OUTPUT;
+
+    $mimetype = resourcelib_guess_url_mimetype($url->externalurl);
+    $fullurl  = sharedurl_get_full_url($url, $cm, $course);
+    $title    = $url->name;
+
+    $link = html_writer::tag('a', $fullurl, array('href'=>str_replace('&amp;', '&', $fullurl)));
+    $clicktoopen = get_string('clicktoopen', 'sharedurl', $link);
+    $moodleurl = new moodle_url($fullurl);
+
+    $extension = resourcelib_get_extension($url->externalurl);
+
+    $mediamanager = core_media_manager::instance($PAGE);
+    $embedoptions = array(
+        core_media_manager::OPTION_TRUSTED => true,
+        core_media_manager::OPTION_BLOCK => true
+    );
+
+    if (in_array($mimetype, array('image/gif','image/jpeg','image/png'))) {  // It's an image
+        $code = resourcelib_embed_image($fullurl, $title);
+
+    } else if ($mediamanager->can_embed_url($moodleurl, $embedoptions)) {
+        // Media (audio/video) file.
+        $code = $mediamanager->embed_url($moodleurl, $title, 0, 0, $embedoptions);
+
+    } else {
+        // anything else - just try object tag enlarged as much as possible
+        $code = resourcelib_embed_general($fullurl, $title, $clicktoopen, $mimetype);
+    }
+
+    sharedurl_print_header($url, $cm, $course);
+    sharedurl_print_heading($url, $cm, $course);
+
+    echo $code;
+
+    sharedurl_print_intro($url, $cm, $course);
+
+    echo $OUTPUT->footer();
+    die;
 }
 
 /**

@@ -23,17 +23,45 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin['pluginname']            = 'URL partagée';
-$string['modulename']            = 'URL partagée';
-$string['modulename_help']       = 'Le module "URL partagée" permet à un enseignant de créer un lien vers l\'activité d\'un autre cours.
+$plugin['pluginname'] = 'URL partagée';
+$string['modulename'] = 'URL partagée';
+$string['modulename_link'] = 'mod/sharedurl/view';
+$string['modulename_help'] = 'Le module "URL partagée" permet à un enseignant de créer un lien vers l\'activité d\'un autre cours.
                                     Il fonctionne avec le plugin d\'inscription "enrol_shared" qui permet d\'inscrire automatiquement, et pour une période donnée, 
                                     un utilisateur dans le cours ciblé.';
+$string['pluginadministration'] = 'Shared URL administration';
 
-$string['externalurl']           = 'URL de l\'activité';
-$string['invalidstoredurl']      = 'Impossible d\'afficher la page. L\'URL doit rediriger vers une activité existante de cette plateforme moodle';
-$string['modulename']            = 'URL partagée';
-$string['modulenameplural']      = 'URLs partagées';
+$string['externalurl'] = 'URL de l\'activité';
+$string['invalidstoredurl'] = 'Impossible d\'afficher la page. L\'URL doit rediriger vers une activité existante de cette plateforme moodle';
+$string['modulename'] = 'URL partagée';
+$string['modulenameplural'] = 'URLs partagées';
 
 // Capabilities
 $string['sharedurl:addinstance'] = 'Ajouter une nouvelle activité "SharedURL"';
-$string['sharedurl:view']        = 'Afficher une activité "SharedURL"';
+$string['sharedurl:view'] = 'Afficher une activité "SharedURL"';
+
+$string['clicktoopen'] = 'Cliquez sur {$a} pour ouvrir la ressource.';
+$string['configdisplayoptions'] = 'Sélectionner toutes les options qui devraient être disponibles, les options existantes ne seront pas modifiées. Pressez la touche CTRL pour sélectionner plusieurs valeurs';
+$string['configframesize'] = 'Quand une page web est affichée à l\'intérieur d\'une fenêtre, cette valeur est la hauteur (en pixels)';
+$string['contentheader'] = 'Contenu';
+$string['createurl'] = 'Créer une URL partagée';
+$string['displayoptions'] = 'Options d\'affichage disponibles';
+$string['displayselect'] = 'Affichage';
+$string['displayselect_help'] = 'Ce paramètre, ainsi que le type de fichier de l\'URL partagée et le fait que le navigateur autorise ou non l\'intégration, déterminent la manière dont l\'URL est affichée. Les options peuvent inclure :
+
+* Automatique - La meilleure option d\'affichage de l\'URL partagée est sélectionnée automatiquement
+* Intégrée - L\'URL partagé est affiché dans la page sous la barre de navigation avec la description de l\'URL et les blocs éventuels
+* Ouvrir - Seule l\'URL partagée est affichée dans la fenêtre du navigateur
+* En pop-up - L\'URL partagée est affichée dans une nouvelle fenêtre du navigateur sans menu ni barre d\'adresse
+* Dans le cadre - L\'URL partagée est affichée dans un cadre sous la barre de navigation et la description de l\'URL partagée
+* Nouvelle fenêtre - L\'URL partagée est affichée dans une nouvelle fenêtre du navigateur avec des menus et une barre d\'adresse';
+
+$string['displayselectexplain'] = 'Choisir un type d\'affichage, malheureusement tout les type ne sont pas adapté à toutes les URLs partagées.';
+$string['externalurl'] = 'URL partagée externe';
+$string['framesize'] = 'Hauteur de la fenêtre';
+$string['printintro'] = 'Afficher la description de l\'URL partagée';
+$string['printintroexplain'] = 'Affiche la description de l\'URL partagée sous le contenu ? Certains types d\'affichage ne peuvent pas afficher la desription même si elle est activée.';
+$string['popupheight'] = 'Hauteur de la pop-up (en pixels)';
+$string['popupheightexplain'] = 'Défini la hauteur par défaut de la pop-up.';
+$string['popupwidth'] = 'Largeur de la pop-up (en pixels)';
+$string['popupwidthexplain'] = 'Défini la largeur par défaut de la pop-up.';

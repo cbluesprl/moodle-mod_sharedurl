@@ -23,16 +23,43 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin['pluginname']            = 'Shared URL';
-$string['modulename']            = 'URL partagée';
-$string['modulename_help']       = 'Shared URL module permits teachers to add a link to an existing course\'s activity.
+$plugin['pluginname'] = 'Shared URL';
+$string['modulename'] = 'URL partagée';
+$string['modulename_link'] = 'mod/sharedurl/view';
+$string['modulename_help'] = 'Shared URL module permits teachers to add a link to an existing course\'s activity.
                                     It works with the enrol plugin "enrol_shared" which automatically enrol users to that course if they are not already enrolled.';
+$string['pluginadministration'] = 'Shared URL administration';
 
-$string['externalurl']           = 'Activity\'s URL';
-$string['invalidstoredurl']      = 'Cannot display this page. The URL must redirect to an existing activity of this moodle.';
-$string['modulename']            = 'Shared URL';
-$string['modulenameplural']      = 'Shared URLs';
+$string['externalurl'] = 'Activity\'s URL';
+$string['invalidstoredurl'] = 'Cannot display this page. The URL must redirect to an existing activity of this moodle.';
+$string['modulename'] = 'Shared URL';
+$string['modulenameplural'] = 'Shared URLs';
 
 // Capabilities
 $string['sharedurl:addinstance'] = 'Add a new sharedURL resource';
-$string['sharedurl:view']        = 'View shared URL';
+$string['sharedurl:view'] = 'View shared URL';
+
+$string['clicktoopen'] = 'Click {$a} link to open resource.';
+$string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
+$string['configframesize'] = 'When a web page is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
+$string['contentheader'] = 'Content';
+$string['createurl'] = 'Create a shared URL';
+$string['displayoptions'] = 'Available display options';
+$string['displayselect'] = 'Display';
+$string['displayselect_help'] = 'This setting, together with the shared URL file type and whether the browser allows embedding, determines how the URL is displayed. Options may include:
+
+* Automatic - The best display option for the shared URL is selected automatically
+* Embed - The shared URL is displayed within the page below the navigation bar together with the URL description and any blocks
+* Open - Only the shared URL is displayed in the browser window
+* In pop-up - The shared URL is displayed in a new browser window without menus or an address bar
+* In frame - The shared URL is displayed within a frame below the navigation bar and shared URL description
+* New window - The shared URL is displayed in a new browser window with menus and an address bar';
+$string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all shared URLs.';
+$string['externalurl'] = 'External shared URL';
+$string['framesize'] = 'Frame height';
+$string['printintro'] = 'Display shared URL description';
+$string['printintroexplain'] = 'Display shared URL description below content? Some display types may not display description even if enabled.';
+$string['popupheight'] = 'Pop-up height (in pixels)';
+$string['popupheightexplain'] = 'Specifies default height of popup windows.';
+$string['popupwidth'] = 'Pop-up width (in pixels)';
+$string['popupwidthexplain'] = 'Specifies default width of popup windows.';

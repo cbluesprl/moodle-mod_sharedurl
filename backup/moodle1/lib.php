@@ -55,6 +55,30 @@ class moodle1_mod_sharedurl_handler extends moodle1_resource_successor_handler {
         $url['externalurl']  = $data['reference'];
         $url['timemodified'] = $data['timemodified'];
 
+        // populate display and displayoptions fields
+        $options = array('printintro' => 1);
+        if ($data['options'] == 'frame') {
+            $url['display'] = RESOURCELIB_DISPLAY_FRAME;
+
+        } else if ($data['options'] == 'objectframe') {
+            $url['display'] = RESOURCELIB_DISPLAY_EMBED;
+
+        } else if ($data['popup']) {
+            $url['display'] = RESOURCELIB_DISPLAY_POPUP;
+            $rawoptions = explode(',', $data['popup']);
+            foreach ($rawoptions as $rawoption) {
+                list($name, $value) = explode('=', trim($rawoption), 2);
+                if ($value > 0 and ($name == 'width' or $name == 'height')) {
+                    $options['popup'.$name] = $value;
+                    continue;
+                }
+            }
+
+        } else {
+            $url['display'] = RESOURCELIB_DISPLAY_AUTO;
+        }
+        $url['displayoptions'] = serialize($options);
+
         // convert course files embedded into the intro
         $this->fileman = $this->converter->get_file_manager($contextid, 'mod_sharedurl', 'intro');
         $url['intro'] = moodle1_converter::migrate_referenced_files($url['intro'], $this->fileman);

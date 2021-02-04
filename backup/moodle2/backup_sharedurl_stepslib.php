@@ -37,7 +37,7 @@ class backup_sharedurl_activity_structure_step extends backup_activity_structure
 
         // Define each element separated
         $url = new backup_nested_element('sharedurl', array('id'), array(
-            'name', 'intro', 'introformat', 'externalurl', 'parameters', 'timemodified'));
+            'name', 'intro', 'introformat', 'externalurl', 'display', 'displayoptions', 'parameters', 'timemodified'));
 
         // Define sources
         $url->set_source_table('sharedurl', array('id' => backup::VAR_ACTIVITYID));
