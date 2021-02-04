@@ -104,7 +104,7 @@ function sharedurl_get_full_url($url, $cm, $course, $config = null)
         // Thanks to 💩.la emojis count as valid, too.
         $allowed = "[" . $letters . $latin . $digits . $symbols . $arabic . $math . $othernumbers . $geometric .
             $emojis . "]" . preg_quote(';/?:@=&$_.+!*(),-#%', '/');
-        $fullurl = preg_replace_callback("/[^$allowed]/u", 'url_filter_callback', $fullurl);
+        $fullurl = preg_replace_callback("/[^$allowed]/u", 'sharedurl_filter_callback', $fullurl);
     } else {
         // encode special chars only
         $fullurl = str_replace('"', '%22', $fullurl);
@@ -118,6 +118,16 @@ function sharedurl_get_full_url($url, $cm, $course, $config = null)
     $fullurl = str_replace('&', '&amp;', $fullurl);
 
     return $fullurl;
+}
+
+/**
+ * Unicode encoding helper callback
+ * @internal
+ * @param array $matches
+ * @return string
+ */
+function sharedurl_filter_callback($matches) {
+    return rawurlencode($matches[0]);
 }
 
 /**

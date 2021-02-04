@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin['pluginname'] = 'Shared URL';
-$string['modulename'] = 'URL partagée';
+$string['pluginname'] = 'Shared URL';
+$string['modulename'] = 'Shared URL';
 $string['modulename_link'] = 'mod/sharedurl/view';
 $string['modulename_help'] = 'Shared URL module permits teachers to add a link to an existing course\'s activity.
                                     It works with the enrol plugin "enrol_shared" which automatically enrol users to that course if they are not already enrolled.';

@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin['pluginname'] = 'URL partagée';
+$string['pluginname'] = 'URL partagée';
 $string['modulename'] = 'URL partagée';
 $string['modulename_link'] = 'mod/sharedurl/view';
 $string['modulename_help'] = 'Le module "URL partagée" permet à un enseignant de créer un lien vers l\'activité d\'un autre cours.
