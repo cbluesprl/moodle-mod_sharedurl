@@ -314,7 +314,7 @@ function sharedurl_view($url, $course, $cm, $context)
 function sharedurl_get_final_display_type($url) {
     global $CFG;
 
-    if ($url->display != RESOURCELIB_DISPLAY_AUTO) {
+    if (isset($url->display) && $url->display != RESOURCELIB_DISPLAY_AUTO) {
         return $url->display;
     }
 
