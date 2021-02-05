@@ -42,6 +42,8 @@ if ($ADMIN->fulltree) {
                                   );
 
     //--- general settings -----------------------------------------------------------------------------------
+    $settings->add(new admin_setting_configtext('sharedurl/framesize',
+        get_string('framesize', 'sharedurl'), get_string('configframesize', 'sharedurl'), 130, PARAM_INT));
     $settings->add(new admin_setting_configmultiselect('sharedurl/displayoptions',
         get_string('displayoptions', 'sharedurl'), get_string('configdisplayoptions', 'sharedurl'),
         $defaultdisplayoptions, $displayoptions));
