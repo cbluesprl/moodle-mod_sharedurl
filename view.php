@@ -34,6 +34,8 @@ $id = optional_param('id', 0, PARAM_INT);        // Course module ID (sharedurl'
 $redirect = optional_param('redirect', 0, PARAM_BOOL);
 $forceview = optional_param('forceview', 0, PARAM_BOOL);
 
+//var_dump($id, $redirect, $forceview);die;
+
 $cm = get_coursemodule_from_id('sharedurl', $id, 0, false, MUST_EXIST);
 $url = $DB->get_record('sharedurl', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -110,42 +112,43 @@ if ($displaytype == RESOURCELIB_DISPLAY_OPEN) {
     $redirect = true;
 }
 
+$fullurl = str_replace('&amp;', '&', sharedurl_get_full_url($url, $cm, $course));
+
+if (!course_get_format($course)->has_view_page()) {
+    // If course format does not have a view page, add redirection delay with a link to the edit page.
+    // Otherwise teacher is redirected to the external URL without any possibility to edit activity or course settings.
+    $editurl = null;
+    if (has_capability('moodle/course:manageactivities', $context)) {
+        $editurl = new moodle_url('/course/modedit.php', array('update' => $cm->id));
+        $edittext = get_string('editthisactivity');
+    } else if (has_capability('moodle/course:update', $context->get_course_context())) {
+        $editurl = new moodle_url('/course/edit.php', array('id' => $course->id));
+        $edittext = get_string('editcoursesettings');
+    }
+    if ($editurl) {
+        redirect($fullurl, html_writer::link($editurl, $edittext) . "<br/>" .
+            get_string('pageshouldredirect'), 10);
+    }
+}
+
+// Check if the user is enrolled in the destination course
+$context = context_course::instance($course_destination->id);
+if (!is_enrolled($context, $USER->id, '', true)) {
+    $enrol_plugin = enrol_get_plugin('shared');
+
+    // Add enrol instance of enrol_shared if it is not already added to the destination course
+    if (!$DB->record_exists('enrol', array('courseid' => $course_destination->id, 'enrol' => 'shared'))) {
+        $enrol_plugin->add_default_instance($course_destination);
+    }
+
+    $instance = $DB->get_record('enrol', array('courseid' => $course_destination->id, 'enrol' => 'shared'), '*', MUST_EXIST);
+
+    // Enrol the user via enrol_shared method
+    $timeend = time() + $instance->enrolperiod; // End of enrol is based on instance's enrol period
+    $enrol_plugin->enrol_user($instance, $USER->id, $instance->roleid, $instance->enrolstartdate, $timeend);
+}
+
 if ($redirect && !$forceview) {
-    $fullurl = str_replace('&amp;', '&', sharedurl_get_full_url($url, $cm, $course));
-
-    if (!course_get_format($course)->has_view_page()) {
-        // If course format does not have a view page, add redirection delay with a link to the edit page.
-        // Otherwise teacher is redirected to the external URL without any possibility to edit activity or course settings.
-        $editurl = null;
-        if (has_capability('moodle/course:manageactivities', $context)) {
-            $editurl = new moodle_url('/course/modedit.php', array('update' => $cm->id));
-            $edittext = get_string('editthisactivity');
-        } else if (has_capability('moodle/course:update', $context->get_course_context())) {
-            $editurl = new moodle_url('/course/edit.php', array('id' => $course->id));
-            $edittext = get_string('editcoursesettings');
-        }
-        if ($editurl) {
-            redirect($fullurl, html_writer::link($editurl, $edittext) . "<br/>" .
-                get_string('pageshouldredirect'), 10);
-        }
-    }
-
-    // Check if the user is enrolled in the destination course
-    $context = context_course::instance($course_destination->id);
-    if (!is_enrolled($context, $USER->id, '', true)) {
-        $enrol_plugin = enrol_get_plugin('shared');
-
-        // Add enrol instance of enrol_shared if it is not already added to the destination course
-        if (!$DB->record_exists('enrol', array('courseid' => $course_destination->id, 'enrol' => 'shared'))) {
-            $enrol_plugin->add_default_instance($course_destination);
-        }
-
-        $instance = $DB->get_record('enrol', array('courseid' => $course_destination->id, 'enrol' => 'shared'), '*', MUST_EXIST);
-
-        // Enrol the user via enrol_shared method
-        $timeend = time() + $instance->enrolperiod; // End of enrol is based on instance's enrol period
-        $enrol_plugin->enrol_user($instance, $USER->id, $instance->roleid, $instance->enrolstartdate, $timeend);
-    }
     redirect($fullurl);
 }
 
