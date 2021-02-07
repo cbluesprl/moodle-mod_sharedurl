@@ -18,7 +18,7 @@
 /**
  * Shared sharedurl module admin settings and defaults
  *
- * @package    mod_sharedsharedurl
+ * @package    mod_sharedurl
  * @copyright  2021 CBlue SPRL
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
