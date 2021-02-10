@@ -63,3 +63,4 @@ $string['popupheight'] = 'Pop-up height (in pixels)';
 $string['popupheightexplain'] = 'Specifies default height of popup windows.';
 $string['popupwidth'] = 'Pop-up width (in pixels)';
 $string['popupwidthexplain'] = 'Specifies default width of popup windows.';
+$string['privacy:metadata'] = 'The shared URL plugin does not store any personal data.';
